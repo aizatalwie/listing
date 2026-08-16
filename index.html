@@ -112,7 +112,7 @@ function render(){
   return f&&s
  });
  $("count").textContent=`${rows.length} ${rows.length===1?"Property":"Properties"}`;
- if(!rows.length){$("grid").innerHTML='<div class="empty">Tiada property dijumpai.</div>';return}
+ if(!rows.length){$("grid").innerHTML='<div class="empty">Tiada listing dijumpai.</div>';return}
  $("grid").innerHTML=rows.map(x=>{
   const im=imgs(x),first=im[0]||"";
   const cls=x.status==="Sold"?"badge sold":x.status==="Reserved"?"badge reserved":"badge";

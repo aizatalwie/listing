@@ -120,7 +120,7 @@ function render(){
    <div class="photo">${first?`<img src="${esc(first)}" alt="${esc(x.title)}" loading="lazy">`:`<div style="height:100%;display:grid;place-items:center;font-size:55px">🏠</div>`}
    <span class="${cls}">${esc(x.status||x.listing_type)}</span>${im.length>1?`<span class="photo-count">📷 ${im.length}</span>`:""}</div>
    <div class="info"><div class="title">${esc(x.title)}</div><div class="location">📍 ${esc(x.location||"-")}</div><div class="price">${money(x.price)}</div>
-   <div class="specs">${x.bedrooms!=null?`<span>🛏 ${esc(x.bedrooms)} Bilik</span>`:""}${x.bathrooms!=null?`<span>🚿 ${esc(x.bathrooms)} Air</span>`:""}${x.built_up?`<span>📐 ${esc(x.built_up)}</span>`:""}</div></div>
+   <div class="specs">${x.bedrooms!=null?`<span>🛏 ${esc(x.bedrooms)} Bilik Tidur</span>`:""}${x.bathrooms!=null?`<span>🚿 ${esc(x.bathrooms)} Bilik Air</span>`:""}${x.built_up?`<span>📐 ${esc(x.built_up)}</span>`:""}</div></div>
   </article>`
  }).join("")
 }
@@ -136,7 +136,7 @@ window.openModal=id=>{
  ${im.length>1?`<div class="thumbs">${im.map((u,i)=>`<img class="thumb ${i?"":"selected"}" src="${esc(u)}" onclick="changeImg(this,'${esc(u)}')">`).join("")}</div>`:""}</div>
  <div class="detail"><span class="detailtag">${esc(x.listing_type)} · ${esc(x.status||"Available")}</span>
  <h2>${esc(x.title)}</h2><div class="muted">📍 ${esc(x.location||"-")}</div><div class="detailprice">${money(x.price)}</div>
- <div class="detailgrid">${x.bedrooms!=null?`<div class="spec"><b>🛏 ${esc(x.bedrooms)}</b><span>Bilik</span></div>`:""}${x.bathrooms!=null?`<div class="spec"><b>🚿 ${esc(x.bathrooms)}</b><span>Bilik Air</span></div>`:""}${x.built_up?`<div class="spec"><b>${esc(x.built_up)}</b><span>Built-up</span></div>`:""}${x.land_area?`<div class="spec"><b>${esc(x.land_area)}</b><span>Land Area</span></div>`:""}</div>
+ <div class="detailgrid">${x.bedrooms!=null?`<div class="spec"><b>🛏 ${esc(x.bedrooms)}</b><span>Bilik Tidur</span></div>`:""}${x.bathrooms!=null?`<div class="spec"><b>🚿 ${esc(x.bathrooms)}</b><span>Bilik Air</span></div>`:""}${x.built_up?`<div class="spec"><b>${esc(x.built_up)}</b><span>Built-up</span></div>`:""}${x.land_area?`<div class="spec"><b>${esc(x.land_area)}</b><span>Land Area</span></div>`:""}</div>
  ${x.description?`<h3>Property Details</h3><div class="desc">${esc(x.description)}</div>`:""}
  ${x.whatsapp&&x.status!=="Sold"?`<a class="wa" target="_blank" rel="noopener" href="https://wa.me/${String(x.whatsapp).replace(/\\D/g,"")}?text=${encodeURIComponent("Hi, saya berminat dengan property: "+x.title+(x.location?" - "+x.location:""))}">💬 WhatsApp Agent</a>`:""}
  <a class="share" href="#" onclick="shareListing(event,'${esc(x.title)}')">↗ Share Property</a></div>`;

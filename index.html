@@ -111,7 +111,7 @@ function render(){
   const s=!q||[x.title,x.location,x.listing_type,x.status,x.description].some(v=>String(v||"").toLowerCase().includes(q));
   return f&&s
  });
- $("count").textContent=`${rows.length} ${rows.length===1?"Listing":"Properties"}`;
+ $("count").textContent=`${rows.length} ${rows.length===1?"Listing":"Listings"}`;
  if(!rows.length){$("grid").innerHTML='<div class="empty">Tiada listing dijumpai.</div>';return}
  $("grid").innerHTML=rows.map(x=>{
   const im=imgs(x),first=im[0]||"";

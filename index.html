@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#111111">
+<title>Aizat Alwie Property Listing</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box}
+:root{--ink:#151515;--soft:#f7f6f2;--line:#e8e6df;--gold:#b28a43;--muted:#777}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:var(--soft);color:var(--ink)}
+button,input{font:inherit}
+.hero{background:#111;color:#fff;padding:24px 18px 82px}
+.hero-in{max-width:1180px;margin:auto}
+.nav{display:flex;justify-content:space-between;align-items:center}
+.logo{font-size:15px;font-weight:900;letter-spacing:2px}
+.navtag{font-size:12px;color:#cdb77d}
+.hero h1{font-size:clamp(30px,5vw,48px);line-height:1.04;max-width:700px;margin:55px 0 10px}
+.hero p{color:#c7c7c7;margin:0;font-size:15px}
+.searchbox{max-width:1180px;margin:-43px auto 0;padding:0 18px;position:relative}
+.searchpanel{background:#fff;border-radius:18px;padding:8px;box-shadow:0 10px 35px rgba(0,0,0,.15);display:flex;gap:8px}
+.searchpanel input{border:0;outline:0;flex:1;padding:13px 10px;font-size:16px;min-width:0}
+.searchicon{padding:12px 8px;font-size:18px}
+.filters{max-width:1180px;margin:15px auto;padding:0 18px;display:flex;gap:8px;overflow:auto;scrollbar-width:none}
+.filters::-webkit-scrollbar{display:none}
+.filter{border:1px solid var(--line);background:#fff;padding:10px 16px;border-radius:999px;white-space:nowrap;font-size:13px;font-weight:800;cursor:pointer}
+.filter.active{background:#111;color:#fff;border-color:#111}
+.wrap{max-width:1180px;margin:auto;padding:4px 18px 45px}
+.meta{display:flex;justify-content:space-between;align-items:center;margin:18px 0 14px}
+.count{font-weight:900;font-size:18px}.muted{color:var(--muted);font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+.card{background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:0 5px 20px rgba(0,0,0,.045);cursor:pointer;transition:.18s}
+.card:hover{transform:translateY(-3px);box-shadow:0 10px 28px rgba(0,0,0,.08)}
+.photo{height:245px;background:#e9e7e0;position:relative}
+.photo img{width:100%;height:100%;object-fit:cover;display:block}
+.badge{position:absolute;top:13px;left:13px;background:#111;color:#fff;padding:6px 9px;border-radius:999px;font-size:10px;font-weight:900}
+.sold{background:#9d1111}.reserved{background:#8a6a1f}
+.photo-count{position:absolute;right:13px;bottom:13px;background:rgba(0,0,0,.72);color:#fff;padding:6px 9px;border-radius:999px;font-size:11px}
+.info{padding:16px}.title{font-size:18px;font-weight:900;margin-bottom:5px}
+.location{font-size:13px;color:#666;margin-bottom:11px}
+.price-row{display:flex;justify-content:space-between;align-items:baseline;gap:12px}.price{font-size:21px;font-weight:950}.monthly{font-size:16px;font-weight:800;white-space:nowrap}.specs{display:flex;gap:14px;margin-top:10px;color:#555;font-size:12px}
+.empty{grid-column:1/-1;text-align:center;padding:60px 10px;color:#777}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:30;display:none;overflow:auto}
+.modal.open{display:block}.modalbox{background:#fff;max-width:900px;margin:25px auto;border-radius:22px;overflow:hidden;position:relative}
+.close{position:absolute;right:13px;top:13px;width:42px;height:42px;border:0;border-radius:50%;background:rgba(0,0,0,.72);color:#fff;font-size:22px;z-index:4;cursor:pointer}
+.gallery{background:#111}.mainimg{width:100%;height:500px;object-fit:contain;display:block}
+.thumbs{display:flex;gap:8px;overflow:auto;padding:10px}.thumb{width:78px;height:60px;object-fit:cover;border-radius:8px;opacity:.6;cursor:pointer;border:2px solid transparent}.thumb.selected{opacity:1;border-color:#fff}
+.mainimg{cursor:zoom-in;touch-action:pan-y}
+.fullscreen-view{position:fixed;inset:0;background:#000;z-index:100;display:none;align-items:center;justify-content:center;touch-action:none}
+.fullscreen-view.open{display:flex}
+.fullscreen-img{width:100%;height:100%;object-fit:contain;display:block;user-select:none;-webkit-user-drag:none}
+.fullscreen-close{position:absolute;right:16px;top:16px;width:44px;height:44px;border:0;border-radius:50%;background:rgba(255,255,255,.18);color:#fff;font-size:28px;line-height:44px;padding:0;z-index:2;cursor:pointer}
+.detail{padding:23px}.detailtag{display:inline-block;background:#f0ece2;color:#795b27;border-radius:999px;padding:6px 10px;font-size:11px;font-weight:900}
+.detail h2{font-size:30px;line-height:1.1;margin:11px 35px 5px 0}.detailprice{font-size:27px;font-weight:950;margin:14px 0 0}.detailmonthly-label{font-size:13px;font-weight:800;margin-top:9px}.detailmonthly{font-size:16px;font-weight:800;white-space:nowrap;margin-top:4px}
+.detailgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin:18px 0}.spec{background:#f6f5f1;border-radius:13px;padding:13px;text-align:center}.spec b{display:block;font-size:16px}.spec span{display:block;color:#777;font-size:10px;margin-top:3px}
+.desc{white-space:pre-line;line-height:1.65;color:#444;font-size:14px}.wa{display:block;text-align:center;text-decoration:none;background:#111;color:#fff;padding:15px;border-radius:12px;font-weight:900;margin-top:20px}
+.share{display:block;text-align:center;border:1px solid #ddd;color:#111;text-decoration:none;padding:13px;border-radius:12px;font-weight:800;margin-top:9px}
+footer{text-align:center;color:#888;font-size:11px;padding:28px}
+.loading{grid-column:1/-1;text-align:center;padding:55px;color:#777}
+@media(max-width:900px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){
+ .hero{padding-bottom:75px}.hero h1{margin-top:42px}.grid{grid-template-columns:1fr}.photo{height:245px}
+ .modalbox{margin:0;min-height:100vh;border-radius:0}.mainimg{height:320px}.detail h2{font-size:25px}
+ .detailgrid{grid-template-columns:repeat(2,1fr)}.meta .muted{display:none}
+}
+</style>
+</head>
+<body>
+<header class="hero">
+ <div class="hero-in">
+  <div class="nav"><div class="logo">PROPERTY LISTING</div><div class="navtag">NEW & SUBSALE</div></div>
+  <h1>Pencarian rumah idaman<br>bermula di sini.</h1>
+  <p>Cari rumah pilihan, bandingkan butiran dan terus hubungi ejen anda..</p>
+ </div>
+</header>
+
+<div class="searchbox"><div class="searchpanel"><span class="searchicon" style="font-size: 27px;">⌕</span><input id="search" placeholder="Cari rumah atau lokasi..."></div></div>
+
+<div class="filters">
+ <button class="filter active" data-filter="All">Semua</button>
+ <button class="filter" data-filter="New">Rumah Baru</button>
+ <button class="filter" data-filter="Subsale">Subsale</button>
+ <button class="filter" data-filter="Available">Available</button>
+ <button class="filter" data-filter="Reserved">Reserved</button>
+ <button class="filter" data-filter="Sold">Sold</button>
+</div>
+
+<main class="wrap">
+ <div class="meta"><div id="count" class="count">Loading...</div><div class="muted">Listing terkini</div></div>
+ <div id="grid" class="grid"><div class="loading">Memuatkan listing...</div></div>
+</main>
+<footer>AIZATALWIE COPYRIGHT RESERVED</footer>
+
+<div id="modal" class="modal"><div class="modalbox"><button class="close" onclick="closeModal()">×</button><div id="modalContent"></div></div></div>
+<div id="fullscreenView" class="fullscreen-view"><button class="fullscreen-close" onclick="closeFullscreen(event)" aria-label="Tutup">×</button><img id="fullscreenImg" class="fullscreen-img" src="" alt=""></div>
+
+<script>
+const SUPABASE_URL="https://axaunfzdyqgqxtunlntw.supabase.co";
+const SUPABASE_KEY="sb_publishable_fb-Fg80ze_LeA9onM19BUQ_XZAZOp-k";
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+let listings=[],activeFilter="All";
+let currentGallery=[],currentGalleryIndex=0;
+let swipeStartX=0;
+const $=id=>document.getElementById(id);
+function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
+function money(v){return v==null||v===""?"Harga atas permintaan":"RM "+Number(v).toLocaleString("en-MY")}
+function imgs(x){return Array.isArray(x.images)?x.images:[]}
+
+async function load(){
+ const {data,error}=await sb.from("properties").select("*").order("created_at",{ascending:false});
+ if(error){$("grid").innerHTML=`<div class="empty">Tidak dapat memuatkan listing.<br>${esc(error.message)}</div>`;return}
+ listings=data||[];render()
+}
+function render(){
+ const q=$("search").value.trim().toLowerCase();
+ const rows=listings.filter(x=>{
+  const f=activeFilter==="All"||x.listing_type===activeFilter||x.status===activeFilter;
+  const s=!q||[x.title,x.location,x.listing_type,x.status,x.description].some(v=>String(v||"").toLowerCase().includes(q));
+  return f&&s
+ });
+ $("count").textContent=`${rows.length} ${rows.length===1?"Listing":"Listings"}`;
+ if(!rows.length){$("grid").innerHTML='<div class="empty">Tiada listing dijumpai.</div>';return}
+ $("grid").innerHTML=rows.map(x=>{
+  const im=imgs(x),first=im[0]||"";
+  const cls=x.status==="Sold"?"badge sold":x.status==="Reserved"?"badge reserved":"badge";
+  return `<article class="card" onclick="openModal('${x.id}')">
+   <div class="photo">${first?`<img src="${esc(first)}" alt="${esc(x.title)}" loading="lazy">`:`<div style="height:100%;display:grid;place-items:center;font-size:55px">🏠</div>`}
+   <span class="${cls}">${esc(x.status||x.listing_type)}</span>${im.length>1?`<span class="photo-count">📷 ${im.length}</span>`:""}</div>
+   <div class="info"><div class="title">${esc(x.title)}</div><div class="location">📍 ${esc(x.location||"-")}</div><div class="price-row"><div class="price">${money(x.price)}</div>${x.monthly_payment!=null&&x.monthly_payment!==""?`<div class="monthly">RM ${Number(x.monthly_payment).toLocaleString("en-MY")}/bulan</div>`:""}</div>
+   <div class="specs">${x.bedrooms!=null?`<span>🛏 ${esc(x.bedrooms)} Bilik Tidur</span>`:""}${x.bathrooms!=null?`<span>🚿 ${esc(x.bathrooms)} Bilik Air</span>`:""}${x.built_up?`<span>📐 ${esc(x.built_up)}</span>`:""}</div></div>
+  </article>`
+ }).join("")
+}
+$("search").addEventListener("input",render);
+document.querySelectorAll(".filter").forEach(b=>b.onclick=()=>{document.querySelectorAll(".filter").forEach(x=>x.classList.remove("active"));b.classList.add("active");activeFilter=b.dataset.filter;render()});
+
+window.openModal=id=>{
+ const x=listings.find(v=>v.id===id);if(!x)return;
+ const im=imgs(x),first=im[0]||"";
+ currentGallery=im;currentGalleryIndex=0;
+ const share=location.href.split("#")[0];
+ $("modalContent").innerHTML=`<div class="gallery">
+ ${first?`<img id="mainimg" class="mainimg" src="${esc(first)}" alt="">`:`<div class="mainimg" style="display:grid;place-items:center;color:white;font-size:70px">🏠</div>`}
+ ${im.length>1?`<div class="thumbs">${im.map((u,i)=>`<img class="thumb ${i?"":"selected"}" src="${esc(u)}" onclick="changeImgIndex(${i})">`).join("")}</div>`:""}</div>
+ <div class="detail"><span class="detailtag">${esc(x.listing_type)} · ${esc(x.status||"Available")}</span>
+ <h2>${esc(x.title)}</h2><div class="muted">📍 ${esc(x.location||"-")}</div><div class="detailprice">${money(x.price)}</div>${x.monthly_payment!=null&&x.monthly_payment!==""?`<div class="detailmonthly-label">Anggaran Bulanan</div><div class="detailmonthly">RM ${Number(x.monthly_payment).toLocaleString("en-MY")}/bulan</div>`:""}
+ <div class="detailgrid">${x.bedrooms!=null?`<div class="spec"><b>🛏 ${esc(x.bedrooms)}</b><span>Bilik Tidur</span></div>`:""}${x.bathrooms!=null?`<div class="spec"><b>🚿 ${esc(x.bathrooms)}</b><span>Bilik Air</span></div>`:""}${x.built_up?`<div class="spec"><b>${esc(x.built_up)}</b><span>Built-up</span></div>`:""}${x.land_area?`<div class="spec"><b>${esc(x.land_area)}</b><span>Land Area</span></div>`:""}</div>
+ ${x.description?`<h3>Property Details</h3><div class="desc">${esc(x.description)}</div>`:""}
+ ${x.whatsapp&&x.status!=="Sold"?`<a class="wa" target="_blank" rel="noopener" href="https://wa.me/${String(x.whatsapp).replace(/\D/g,"")}?text=${encodeURIComponent("Hi, saya berminat dengan property: "+x.title+(x.location?" - "+x.location:""))}">💬 WhatsApp Agent</a>`:""}
+ <a class="share" href="#" onclick="shareListing(event,'${esc(x.title)}')">↗ Share Property</a></div>`;
+ $("modal").classList.add("open");document.body.style.overflow="hidden";
+ const main=$("mainimg");
+ if(main){
+   main.onclick=()=>openFullscreen(currentGalleryIndex);
+   main.ontouchstart=e=>{swipeStartX=e.changedTouches[0].clientX};
+   main.ontouchend=e=>handleSwipe(e.changedTouches[0].clientX);
+ }
+};
+window.changeImgIndex=i=>{
+ if(!currentGallery[i])return;
+ currentGalleryIndex=i;
+ const m=$("mainimg");if(m)m.src=currentGallery[i];
+ document.querySelectorAll(".thumb").forEach((x,n)=>x.classList.toggle("selected",n===i));
+};
+window.handleSwipe=endX=>{
+ const dx=endX-swipeStartX;
+ if(Math.abs(dx)<50)return;
+ if(dx<0 && currentGalleryIndex<currentGallery.length-1)changeImgIndex(currentGalleryIndex+1);
+ if(dx>0 && currentGalleryIndex>0)changeImgIndex(currentGalleryIndex-1);
+};
+window.openFullscreen=i=>{
+ if(!currentGallery[i])return;
+ currentGalleryIndex=i;
+ $("fullscreenImg").src=currentGallery[i];
+ $("fullscreenView").classList.add("open");
+};
+window.closeFullscreen=e=>{
+ if(e)e.stopPropagation();
+ $("fullscreenView").classList.remove("open");
+};
+function syncFullscreen(){
+ const img=$("fullscreenImg");
+ if(img)img.src=currentGallery[currentGalleryIndex]||"";
+ document.querySelectorAll(".thumb").forEach((x,n)=>x.classList.toggle("selected",n===currentGalleryIndex));
+ const main=$("mainimg");if(main)main.src=currentGallery[currentGalleryIndex]||"";
+}
+$("fullscreenView").addEventListener("touchstart",e=>{swipeStartX=e.changedTouches[0].clientX});
+$("fullscreenView").addEventListener("touchend",e=>{
+ const dx=e.changedTouches[0].clientX-swipeStartX;
+ if(Math.abs(dx)>=50){
+   if(dx<0 && currentGalleryIndex<currentGallery.length-1)currentGalleryIndex++;
+   else if(dx>0 && currentGalleryIndex>0)currentGalleryIndex--;
+   syncFullscreen();
+ }
+});
+$("fullscreenView").addEventListener("click",e=>{if(e.target===$("fullscreenView"))closeFullscreen(e)});
+window.shareListing=async(e,title)=>{e.preventDefault();try{if(navigator.share)await navigator.share({title,text:"Property: "+title,url:location.href});else{await navigator.clipboard.writeText(location.href);alert("Link property disalin.")}}catch(_){}};
+window.closeModal=()=>{$("fullscreenView").classList.remove("open");$("modal").classList.remove("open");document.body.style.overflow=""};
+$("modal").onclick=e=>{if(e.target===$("modal"))closeModal()};
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){if($("fullscreenView").classList.contains("open"))closeFullscreen();else closeModal()}});
+load();
+</script>
+</body>
+</html>

@@ -460,25 +460,12 @@ async function removeStorageFiles(urls){
     throw new Error("Sesi Admin tiada. Sila login semula.");
   }
 
-  const response = await fetch(`${SUPABASE_URL}/functions/v1/delete-property-images`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${accessToken}`,
-      "apikey": SUPABASE_KEY
-    },
-    body: JSON.stringify({paths})
-  });
+  const {error} = await sb.storage
+    .from("property-images")
+    .remove(paths);
 
-  let result = {};
-  try { result = await response.json(); } catch (_) {}
-
-  if(!response.ok){
-    throw new Error(result.error || `Delete Storage gagal (${response.status}).`);
-  }
-
-  if(!result.success){
-    throw new Error(result.error || "Edge Function gagal memadam gambar.");
+  if(error){
+    throw new Error(error.message || "Gagal memadam gambar daripada Storage.");
   }
 }
 
@@ -778,7 +765,7 @@ async function deletePropertyRecord(id){
   if(!x || !confirm(`Delete "${x.title}"?\n\nSemua gambar listing ini juga akan dipadam daripada Storage.`)) return;
 
   try{
-    // await deletePropertyImages(x);
+    await deletePropertyImages(x);
 
     const {error} = await sb.from("properties").delete().eq("id",id);
     if(error) throw error;

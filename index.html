@@ -107,6 +107,22 @@ footer{text-align:center;color:#888;font-size:11px;padding:28px}
 const SUPABASE_URL="https://axaunfzdyqgqxtunlntw.supabase.co";
 const SUPABASE_KEY="sb_publishable_fb-Fg80ze_LeA9onM19BUQ_XZAZOp-k";
 const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+
+async function trackEvent(eventType,propertyId=null){
+ try{
+  await sb.from("analytics_events").insert([{
+   event_type:eventType,
+   property_id:propertyId!=null?String(propertyId):null
+  }]);
+ }catch(err){
+  console.warn("Analytics:",err?.message||err);
+ }
+}
+
+if(!sessionStorage.getItem("analytics_page_view")){
+ sessionStorage.setItem("analytics_page_view","1");
+ trackEvent("page_view");
+}
 let listings=[],activeFilter="Available",activePriceFilter="All";
 let currentGallery=[],currentGalleryIndex=0;
 let swipeStartX=0;
@@ -157,7 +173,7 @@ document.querySelectorAll(".filter").forEach(b=>b.onclick=()=>{document.querySel
 $("priceFilter").addEventListener("change",e=>{activePriceFilter=e.target.value;render()});
 
 window.openModal=(id,fromUrl=false)=>{
- const x=listings.find(v=>String(v.id)===String(id));if(!x)return;window.currentPropertyId=id;
+ const x=listings.find(v=>String(v.id)===String(id));if(!x)return;window.currentPropertyId=id;trackEvent("property_view",id);
  if(!fromUrl){
   const url=new URL(location.href);url.search="";url.hash="property-"+encodeURIComponent(id);history.pushState({propertyId:String(id)},"",url.toString());
  }
@@ -171,7 +187,7 @@ window.openModal=(id,fromUrl=false)=>{
  <h2>${esc(x.title)}</h2><div class="muted">📍 ${esc(x.location||"-")}</div><div class="detailprice">${money(x.price)}</div>${x.monthly_payment!=null&&x.monthly_payment!==""?`<div class="detailmonthly-label">Anggaran Bulanan</div><div class="detailmonthly">RM ${Number(x.monthly_payment).toLocaleString("en-MY")}/bulan</div>`:""}
  <div class="detailgrid">${x.bedrooms!=null?`<div class="spec"><b>🛏 ${esc(x.bedrooms)}</b><span>Bilik Tidur</span></div>`:""}${x.bathrooms!=null?`<div class="spec"><b>🚿 ${esc(x.bathrooms)}</b><span>Bilik Air</span></div>`:""}${x.built_up?`<div class="spec"><b>${esc(x.built_up)}</b><span>Built-up</span></div>`:""}${x.land_area?`<div class="spec"><b>${esc(x.land_area)}</b><span>Land Area</span></div>`:""}</div>
  ${x.description?`<h3>Property Details</h3><div class="desc">${esc(x.description)}</div>`:""}
- ${x.whatsapp&&x.status!=="Sold"?`<a class="wa" target="_blank" rel="noopener" href="https://wa.me/${"6"+String(x.whatsapp).replace(/\D/g,"")}?text=${encodeURIComponent("Hi, saya berminat dengan property: "+x.title+(x.location?" - "+x.location:""))}">💬 WhatsApp Agent</a>`:""}
+ ${x.whatsapp&&x.status!=="Sold"?`<a class="wa" target="_blank" rel="noopener" onclick="trackEvent(\'whatsapp_click\',\'${esc(x.id)}\')" href="https://wa.me/${"6"+String(x.whatsapp).replace(/\D/g,"")}?text=${encodeURIComponent("Hi, saya berminat dengan property: "+x.title+(x.location?" - "+x.location:""))}">💬 WhatsApp Agent</a>`:""}
  <a class="share" href="#" onclick="shareListing(event,'${esc(x.title)}')">↗ Share Property</a></div>`;
  $("modal").classList.add("open");
   document.body.style.overflow="hidden";
@@ -224,7 +240,7 @@ $("fullscreenView").addEventListener("touchend",e=>{
  }
 });
 $("fullscreenView").addEventListener("click",e=>{if(e.target===$("fullscreenView"))closeFullscreen(e)});
-window.shareListing=async(e,title)=>{e.preventDefault();try{const id=window.currentPropertyId;if(!id)return;const url=new URL(location.href);url.search="";url.hash="property-"+id;if(navigator.share)await navigator.share({title,text:"Property: "+title,url:url.toString()});else{await navigator.clipboard.writeText(url.toString());alert("Link property disalin.")}}catch(_){}};
+window.shareListing=async(e,title)=>{e.preventDefault();try{const id=window.currentPropertyId;if(!id)return;trackEvent("share_property",id);const url=new URL(location.href);url.search="";url.hash="property-"+id;if(navigator.share)await navigator.share({title,text:"Property: "+title,url:url.toString()});else{await navigator.clipboard.writeText(url.toString());alert("Link property disalin.")}}catch(_){}};
 window.closeModal=()=>{$("fullscreenView").classList.remove("open");$("modal").classList.remove("open");document.body.style.overflow="";document.documentElement.style.overflow="";window.currentPropertyId=null;history.replaceState({}, "", location.pathname+location.search);};
 window.addEventListener("popstate",()=>{
   const hash=decodeURIComponent(location.hash.replace(/^#property-/,""));

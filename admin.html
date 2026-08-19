@@ -71,7 +71,7 @@
     .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;padding:18px;z-index:9999}.modal-overlay.open{display:flex}
     .modal-box{width:min(920px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.25);padding:20px}
     .modal-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}.modal-close{background:#eee;color:#111;width:40px;height:40px;padding:0;font-size:22px}
-    .analytics-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}.analytics-card{background:#fff;border-radius:18px;padding:18px;box-shadow:0 3px 18px rgba(0,0,0,.06)}.analytics-label{font-size:13px;color:#777;font-weight:700}.analytics-number{font-size:30px;font-weight:900;margin-top:8px}.analytics-list{background:#fff;border-radius:18px;padding:20px;box-shadow:0 3px 18px rgba(0,0,0,.06);margin-top:14px}.analytics-row{display:flex;justify-content:space-between;gap:14px;padding:11px 0;border-top:1px solid #eee}.analytics-row:first-child{border-top:0}
+    .analytics-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}.analytics-card{background:#fff;border-radius:18px;padding:18px;box-shadow:0 3px 18px rgba(0,0,0,.06)}.analytics-label{font-size:13px;color:#777;font-weight:700}.analytics-number{font-size:30px;font-weight:900;margin-top:8px}.analytics-list{background:#fff;border-radius:18px;padding:20px;box-shadow:0 3px 18px rgba(0,0,0,.06);margin-top:14px;margin-bottom:14px}.analytics-row{display:flex;justify-content:space-between;gap:14px;padding:11px 0;border-top:1px solid #eee}.analytics-row:first-child{border-top:0}
     @media(max-width:700px){.analytics-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.modal-overlay{padding:10px}.modal-box{max-height:95vh;padding:14px}}
 
     /* House background - login & Add Listing only */
@@ -203,7 +203,7 @@
       <button id="addListingNav" type="button" class="primary">+ Add Listing</button>
     </div>
 
-    <div id="analyticsSection" class="section-view active">
+    <div id="analyticsSection" class="section-view">
       <div class="analytics-grid">
         <div class="analytics-card"><div class="analytics-label">Website Visitors</div><div id="analyticsVisitors" class="analytics-number">0</div></div>
         <div class="analytics-card"><div class="analytics-label">WhatsApp Agent Click</div><div id="analyticsWhatsapp" class="analytics-number">0</div></div>

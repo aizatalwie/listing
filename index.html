@@ -173,7 +173,8 @@ document.querySelectorAll(".filter").forEach(b=>b.onclick=()=>{document.querySel
 $("priceFilter").addEventListener("change",e=>{activePriceFilter=e.target.value;render()});
 
 window.openModal=(id,fromUrl=false)=>{
- const x=listings.find(v=>String(v.id)===String(id));if(!x)return;window.currentPropertyId=id;trackEvent("property_view",id);
+ const x=listings.find(v=>String(v.id)===String(id));if(!x)return;window.currentPropertyId=id;
+ if(!fromUrl)trackEvent("property_view",id);
  if(!fromUrl){
   const url=new URL(location.href);url.search="";url.hash="property-"+encodeURIComponent(id);history.pushState({propertyId:String(id)},"",url.toString());
  }
